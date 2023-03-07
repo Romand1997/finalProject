@@ -1,0 +1,94 @@
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/AdminPanelPattern.html"
+      xmlns:sec="http//www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<div layout:fragment="contentAdminPanel">
+    <div class="container" id="categories">
+    </div>
+
+    <!-- Модальное окно -->
+    <div class="modal fade" id="confirmDelete" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="confirmDeleteLabel">Удаление категории</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body">
+                    Вы уверены что хотите удалить категорию <br>
+                    "<label id = "nameOfCategory"></label>"
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-danger" id="deleteButton" onclick="deleteCategory(value)">Удалить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        var myDeleteModal = new bootstrap.Modal(document.getElementById('confirmDelete'),{});
+        let categoriesJson
+        getCategories();
+
+        function getCategories() {
+            let htmlCode = "";
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.status == 200 && xmlHttp.readyState == 4) {
+                    categoriesJson = JSON.parse(this.responseText);
+                    htmlCode += "<table class='table table-striped table-hover'>";
+                    htmlCode += "<thead>"
+                    htmlCode += "<tr>"
+                    htmlCode += "<th scope='col'>#</th>"
+                    htmlCode += "<th scope='col'>Название</th>"
+                    htmlCode += "<th style=\"width: 20%\" scope='col'>Изменить</th>"
+                    htmlCode += "<th style=\"width: 20%\" scope='col'>Удалить</th>"
+                    htmlCode += "</tr>"
+                    htmlCode += "</thead>"
+                    htmlCode += "<tbody>"
+                    for (let i = 0; i < categoriesJson.length; i++) {
+                        htmlCode += "<tr>"
+                        htmlCode += "<th scope='row'>" + (i + 1) + "</th>"
+                        htmlCode += "<td>" + categoriesJson[i].name + "</td>"
+                        htmlCode += "<td><a type = 'button' class = 'btn btn-warning' href='/detailsOfCategoryAdminPanel?" + categoriesJson[i].id + "'>Изменить</a></td>"
+                        htmlCode += "<td><a type='button' class ='btn btn-danger' onClick='openModal("+i+")'>Удалить</a></td>"
+                        htmlCode += "</tr>"
+                    }
+                    htmlCode += "</tbody>"
+                    htmlCode += "</table>"
+                }
+                categories.innerHTML = htmlCode;
+            }
+            xmlHttp.open("GET", "/category", true);
+            xmlHttp.send();
+        }
+        function openModal(index){
+            document.getElementById('nameOfCategory').textContent = categoriesJson[index].name;
+            document.getElementById('deleteButton').value = categoriesJson[index].id;
+            myDeleteModal.show();
+        }
+
+        function deleteCategory(id) {
+            myDeleteModal.hide();
+            let json = {
+                "id": id
+            };
+            let body = JSON.stringify(json);
+            const xhr = new XMLHttpRequest();
+            xhr.open("DELETE", "/category", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = () => {
+                if (xhr.status === 200 && xhr.readyState === XMLHttpRequest.DONE) {
+                    let categoryObj = JSON.parse(xhr.responseText);
+                    if (categoryObj === true) {
+                        alert("Категория удалена успешно");
+                        getCategories();
+                    }
+                }
+            }
+            xhr.send(body);
+        }
+    </script>
+</div>
+</html>

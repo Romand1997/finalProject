@@ -1,0 +1,95 @@
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/AdminPanelPattern.html"
+      xmlns:sec="http//www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<div layout:fragment="contentAdminPanel">
+    <div class="container" id="brands">
+    </div>
+
+    <!-- Модальное окно -->
+    <div class="modal fade" id="confirmDelete" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="confirmDeleteLabel">Удаление бренда</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body">
+                    Вы уверены что хотите удалить бренд <br>
+                    "<label id = "nameOfBrand"></label>"?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-danger" id="deleteButton" onclick="deleteBrand(value)">Удалить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        var myDeleteModal = new bootstrap.Modal(document.getElementById('confirmDelete'),{});
+        let brandsJson;
+        getBrands();
+
+        function getBrands() {
+            let htmlCode = "";
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.status == 200 && xmlHttp.readyState == 4) {
+                    brandsJson = JSON.parse(this.responseText);
+                    htmlCode += "<table class='table table-striped table-hover'>";
+                    htmlCode += "<thead>"
+                    htmlCode += "<tr>"
+                    htmlCode += "<th scope='col'>#</th>"
+                    htmlCode += "<th scope='col'>Название</th>"
+                    htmlCode += "<th style=\"width: 20%\" scope='col'>Изменить</th>"
+                    htmlCode += "<th style=\"width: 20%\" scope='col'>Удалить</th>"
+                    htmlCode += "</tr>"
+                    htmlCode += "</thead>"
+                    htmlCode += "<tbody>"
+                    for (let i = 0; i < brandsJson.length; i++) {
+                        htmlCode += "<tr>"
+                        htmlCode += "<th scope='row'>"+(i+1)+"</th>"
+                        htmlCode += "<td>" + brandsJson[i].name + "</td>"
+                        htmlCode += "<td><a type = 'button' class = 'btn btn-warning' href='/detailsOfBrandAdminPanel?"+brandsJson[i].id+"'>Изменить</a></td>"
+                        htmlCode += "<td><a type='button' class ='btn btn-danger' onClick='openModal("+i+")'>Удалить</a></td>"
+                        htmlCode += "</tr>"
+                    }
+                    htmlCode += "</tbody>"
+                    htmlCode += "</table>"
+                }
+                brands.innerHTML = htmlCode;
+            }
+            xmlHttp.open("GET", "/brand", true);
+            xmlHttp.send();
+        }
+
+        function openModal(index){
+            document.getElementById('nameOfBrand').textContent = brandsJson[index].name;
+            document.getElementById('deleteButton').value = brandsJson[index].id;
+            myDeleteModal.show();
+        }
+
+        function deleteBrand(id) {
+            myDeleteModal.hide();
+            let json = {
+                "id": id
+            };
+            let body = JSON.stringify(json);
+            const xhr = new XMLHttpRequest();
+            xhr.open("DELETE", "/brand", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = () => {
+                if (xhr.status === 200 && xhr.readyState === XMLHttpRequest.DONE) {
+                    let brandObj = JSON.parse(xhr.responseText);
+                    if (brandObj === true) {
+                        alert("Бренд удален успешно");
+                        getBrands();
+                    }
+                }
+            }
+            xhr.send(body);
+        }
+    </script>
+</div>
+</html>

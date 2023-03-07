@@ -1,0 +1,189 @@
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/AdminPanelPattern.html"
+      xmlns:sec="http//www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<div layout:fragment="contentAdminPanel">
+    <div id="addItemPage">
+    </div>
+    <div class="container">
+        <label for="namename" class="mt-3 mb-1">
+            Название:
+        </label>
+        <div class="mb-3">
+            <input type="text" class="form-control"
+                   aria-describedby="inputGroup-sizing-default"
+                   id="namename" required>
+        </div>
+        <label for="description" class="mt-3 mb-1">
+            Описание:
+        </label>
+        <div class="mb-3">
+            <textarea class="form-control" id="description"></textarea>
+        </div>
+        <label for="price" class="mt-3 mb-1">
+            Цена:
+        </label>
+        <div class="mb-3">
+            <input type="text" class="form-control"
+                   aria-describedby="inputGroup-sizing-default"
+                   id="price" required>
+        </div>
+        <label for="brand" class="mt-3 mb-1">
+            Название бренда:
+        </label>
+        <div class="mb-3">
+            <select class="form-select" name="category_id" id="brand">
+                <option th:each="brand:${brands}" th:value="${brand.id}"
+                        th:text="${brand.name}">
+                </option>
+            </select>
+        </div>
+    </div>
+    <script type="text/javascript">
+        loadPage();
+        let count = 0;
+        let parametersArray = [];
+
+        function loadPage() {
+            let htmlCode = "";
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.status == 200 && xmlHttp.readyState == 4) {
+                    let massResult = JSON.parse(this.responseText);
+                    htmlCode += "<div class=\"container\" input-group>";
+                    htmlCode += "<div id='categories'>";
+                    htmlCode += "<label for=\"category\" class=\"mt-3 mb-1\">";
+                    htmlCode += "Название категории:";
+                    htmlCode += "</label>";
+                    htmlCode += "<div class=\"mb-3\">";
+                    htmlCode += "<select class=\"form-select\" name=\"category_id\" id=\"category\" onchange='getSecondCategory(value)'>";
+                    htmlCode += "<option value='" + massResult[0].id + "'>";
+                    htmlCode += "не выбрано";
+                    htmlCode += "</option>";
+                    for (let i = 0; i < massResult.length; i++) {
+                        htmlCode += "<option value='" + massResult[i].id + "'>";
+                        htmlCode += massResult[i].name;
+                        htmlCode += "</option>";
+                    }
+                    htmlCode += "</select>";
+                    htmlCode += "</div>";
+                    htmlCode += "</div>";
+                    htmlCode += "<div id='secondCategories'>";
+                    htmlCode += "</div>";
+                    htmlCode += "</div>";
+                }
+                addItemPage.innerHTML = htmlCode;
+            }
+            xmlHttp.open("GET", "/category", true);
+            xmlHttp.send();
+        }
+
+        function getSecondCategory(id) {
+            let htmlCode = "";
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.status == 200 && xmlHttp.readyState == 4) {
+                    let massResult = JSON.parse(this.responseText);
+                    htmlCode += "<label for=\"secondCategory\" class=\"mt-3 mb-1\">";
+                    htmlCode += "Название Подкатегории:";
+                    htmlCode += "</label>";
+                    htmlCode += "<div class=\"mb-3\">";
+                    htmlCode += "<select class=\"form-select\" id=\"secondCategory\" onchange='getCategoriesOfParameterAndParameters(value)'>";
+                    htmlCode += "<option value='" + massResult[0].id + "'>";
+                    htmlCode += "не выбрано";
+                    htmlCode += "</option>";
+                    for (let i = 0; i < massResult.length; i++) {
+                        htmlCode += "<option value='" + massResult[i].id + "'>";
+                        htmlCode += massResult[i].name;
+                        htmlCode += "</option>";
+                    }
+                    htmlCode += "</select>";
+                    htmlCode += "<div id='parameters'>";
+                    htmlCode += "</div>";
+                    htmlCode += "</div>";
+                }
+                secondCategories.innerHTML = htmlCode;
+            }
+            xmlHttp.open("GET", "/category/" + id, true);
+            xmlHttp.send();
+        }
+
+        function getCategoriesOfParameterAndParameters(id) {
+            let htmlCode = "";
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.status == 200 && xmlHttp.readyState == 4) {
+                    let massResult = JSON.parse(this.responseText);
+                    for (let i = 0; i < massResult.length; i++) {
+
+                        htmlCode += "<label for=\"parameter\" class=\"mt-3 mb-1\">";
+                        htmlCode += massResult[i][0].categoryOfParameter.name;
+                        htmlCode += "</label>";
+                        htmlCode += "<div class=\"mb-3\">";
+                        htmlCode += "<select class=\"form-select\" id=\"parameter" + i + "\">";
+                        htmlCode += "<option value = '" + null + "'>";
+                        htmlCode += "не выбрано";
+                        htmlCode += "</option>";
+                        count = count + 1;
+                        for (let j = 0; j < massResult[i].length; j++) {
+                            htmlCode += "<option value = '" + massResult[i][j].id + "'>";
+                            htmlCode += massResult[i][j].name;
+                            htmlCode += "</option>";
+                        }
+                        htmlCode += "</select>";
+                        htmlCode += "</div>";
+                    }
+                }
+                parameters.innerHTML = htmlCode;
+            }
+            xmlHttp.open("GET", "/parameter/" + id, true);
+            xmlHttp.send();
+        }
+
+        function addItem() {
+            console.log("secondCategory"+secondCategory.value);
+            console.log("brand"+brand.value);
+            let secondCategoryObj = {
+                id: secondCategory.value
+            }
+            let brandObj = {
+                id: brand.value
+            }
+            for (let i = 0; i < count; i++) {
+                console.log("parameter"+document.getElementById('parameter' + i).value);
+                let parameterObj = {
+                    id: document.getElementById('parameter' + i).value
+                }
+                if (parameterObj.id!=='null') {
+                    parametersArray.push(parameterObj);
+                }
+            }
+            let json = {
+                "name": namename.value,
+                "description": description.value,
+                "price": price.value,
+                "secondCategory": secondCategoryObj,
+                "brand": brandObj,
+                "parameters": parametersArray
+            };
+            let body = JSON.stringify(json);
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/item", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = () => {
+                if (xhr.status === 200 && xhr.readyState === XMLHttpRequest.DONE) {
+                    let itemObj = JSON.parse(xhr.responseText);
+                    if (itemObj.id != null) {
+                        alert("Товар добавлен успешно");
+                        parametersArray = [];
+                    }
+                }
+            }
+            xhr.send(body);
+        }
+    </script>
+    <div>
+        <button type="button" class="btn btn-primary" onclick="addItem()">Добавить</button>
+    </div>
+</div>
+</html>

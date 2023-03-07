@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http//www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+
+<head>
+    <meta charset="utf-8">
+    <title>trello</title>
+</head>
+<link rel="stylesheet" type="text/css" th:href="@{'/css/bootstrap.css'}">
+<script type="text/javascript" th:src="@{'js/bootstrap.bundle.js'}"></script>
+
+
+<body>
+<div class="container fixed-top">
+    <nav class="rounded navbar navbar-expand-lg bg-light">
+        <div class="container-fluid">
+            <div class="btn-group btn-group-lg" role="group">
+                <a type="button" class="btn btn-warning" th:href="@{'/'}">Shop</a>
+                <a type="button" class="btn btn-warning" th:href="@{'/catalog'}">Catalog</a>
+            </div>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02"
+                    aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Переключатель навигации">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse " id="navbarTogglerDemo02">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                </ul>
+                <div class="d-flex">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" sec:authorize="hasAnyRole('ROLE_ADMIN')" th:href="@{'/adminPanel'}">Панель админа</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" sec:authorize="hasAnyRole('ROLE_SUPERADMIN')" th:href="@{'/superAdminPanel'}">Панель Суперадмина</a>
+                    </li>
+                    <li class="nav-item">
+                        <div id="cartAmount"></div>
+                        <script>
+                            loadAmountOfCart()
+                            function loadAmountOfCart() {
+                                let htmlCode = "";
+                                var xmlHttp = new XMLHttpRequest();
+                                xmlHttp.onreadystatechange = function () {
+                                    if (xmlHttp.status == 200 && xmlHttp.readyState == 4) {
+                                        amountJson = JSON.parse(this.responseText);
+                                       if (amountJson){
+                                           htmlCode += "<a class=\"nav-link\" href='/cartPage'>корзина/"+amountJson+"</a>";
+                                       } else {
+                                           htmlCode += "<a class=\"nav-link\" href='/cartPage'>корзина/0</a>";
+                                       }
+                                    }
+                                    cartAmount.innerHTML = htmlCode;
+                                }
+                                xmlHttp.open("GET", "/order/amount", true);
+                                xmlHttp.send();
+                            }
+                        </script>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="JavaScript:void(0)" sec:authorize="isAuthenticated()" onclick="signOutForm.submit()">выйти</a>
+                        <a class="nav-link" sec:authorize="isAnonymous()" th:href="@{'/signin'}">войти</a>
+                    </li>
+                    <form th:action="@{'/exit'}" id="signOutForm" method="post">
+                    </form>
+
+                </ul>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+</div>
+<div class="my-5 container" layout:fragment="content">
+</div>
+</body>
+</html>

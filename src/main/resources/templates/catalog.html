@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/pattern.html">
+<div layout:fragment="content">
+    <div class="pt-5 row text-center">
+        <div class="col"></div>
+        <div class="col-8">
+            <div class="row text-center" id="categories">
+            </div>
+        </div>
+        <div class="col"></div>
+    </div>
+    <script type="text/javascript">
+        loadNews();
+        function loadNews() {
+            let htmlCode = "";
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.status == 200 && xmlHttp.readyState == 4) {
+                    let massResult = JSON.parse(this.responseText);
+                    for (let i = 0; i < massResult.length; i++) {
+                        htmlCode += "<div class=\"mt-3 mb-3 d-flex justify-content-center col-4\" >";
+                        htmlCode += "<a href=\"/secondCatalog?"+massResult[i].id+"\" class=\"card text-center btn\" style=\"width: 18rem;\">";
+                        htmlCode += "<div class=\"card-body\">\n" +
+                            "                            <h5 class=\"card-title\">"+massResult[i].name+"</h5>\n" +
+                            "                        </div>\n" +
+                            "                    </a>";
+                        htmlCode += "</div>";
+                    }
+                }
+                categories.innerHTML = htmlCode;
+            }
+            xmlHttp.open("GET", "/category", true);
+            xmlHttp.send();
+        }
+    </script>
+
+</div>
+</html>

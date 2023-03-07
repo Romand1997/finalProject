@@ -1,0 +1,220 @@
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/AdminPanelPattern.html"
+      xmlns:sec="http//www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<div layout:fragment="contentAdminPanel">
+    <div class="container">
+        <div id="item">
+        </div>
+        <div id='secondCategories'>
+        </div>
+        <div id='brands'>
+        </div>
+        <div id='parameters'>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        loadItem();
+        loadSecondCategories();
+        loadBrands();
+        loadCategoriesOfParameterAndParameters();
+        let itemJson;
+
+        function loadItem() {
+            var strGET = window.location.search.replace('?', '');
+            let htmlCode = "";
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.status == 200 && xmlHttp.readyState == 4) {
+                    itemJson = JSON.parse(this.responseText);
+                    htmlCode += "<label for='namename' class='mt-3 mb-1'>";
+                    htmlCode += "Название:";
+                    htmlCode += "</label>";
+                    htmlCode += "<div class='mb-3'>";
+                    htmlCode += "<input type='text' value='" + itemJson.name + "' class='form-control' aria-describedby='inputGroup-sizing-default' id='namename' required>";
+                    htmlCode += "</div>";
+                    htmlCode += "<label for='description' class='mt-3 mb-1'>";
+                    htmlCode += "Описание:";
+                    htmlCode += "</label>";
+                    htmlCode += "<div class='mb-3'>";
+                    htmlCode += "<textarea class='form-control' id='description'>" + itemJson.description + "</textarea>";
+                    htmlCode += "</div>";
+                    htmlCode += "<label for='price' class='mt-3 mb-1'>";
+                    htmlCode += "Цена:";
+                    htmlCode += "</label>";
+                    htmlCode += "<div class='mb-3'>";
+                    htmlCode += "<input type='text' value='" + itemJson.price + "' class=\"form-control\" aria-describedby=\"inputGroup-sizing-default\" id='price' required>";
+                    htmlCode += "</div>";
+                }
+                item.innerHTML = htmlCode;
+            }
+            xmlHttp.open("GET", "/item/" + strGET, true);
+            xmlHttp.send();
+        }
+
+        function loadSecondCategories() {
+            let htmlCode = "";
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.status == 200 && xmlHttp.readyState == 4) {
+                    let secondCategoriesJson = JSON.parse(this.responseText);
+                    htmlCode += "<label for=\"secondCategory\" class=\"mt-3 mb-1\">";
+                    htmlCode += "Название Подкатегории:";
+                    htmlCode += "</label>";
+                    htmlCode += "<div class=\"mb-3\">";
+                    htmlCode += "<select class=\"form-select\" id=\"secondCategory\">";
+                    for (let i = 0; i < secondCategoriesJson.length; i++) {
+                        if (secondCategoriesJson[i].id === itemJson.secondCategory.id) {
+                            htmlCode += "<option value='" + secondCategoriesJson[i].id + "' selected>";
+                        } else {
+                            htmlCode += "<option value='" + secondCategoriesJson[i].id + "'>";
+                        }
+                        htmlCode += secondCategoriesJson[i].name;
+                        htmlCode += "</option>";
+                    }
+                    htmlCode += "</select>";
+                    htmlCode += "</div>";
+                }
+                secondCategories.innerHTML = htmlCode;
+            }
+            xmlHttp.open("GET", "/secondCategory", true);
+            xmlHttp.send();
+        }
+
+        function loadBrands() {
+            let htmlCode = "";
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.status == 200 && xmlHttp.readyState == 4) {
+                    let brandsJson = JSON.parse(this.responseText);
+                    htmlCode += "<div input-group>";
+                    htmlCode += "<label for=\"category\" class=\"mt-1 mb-1\">";
+                    htmlCode += "Название бренда:";
+                    htmlCode += "</label>";
+                    htmlCode += "<div class=\"mb-3\">";
+                    htmlCode += "<select class=\"form-select\" id=\"brand\">";
+                    for (let i = 0; i < brandsJson.length; i++) {
+                        if (brandsJson[i].id === itemJson.brand.id) {
+                            htmlCode += "<option value='" + brandsJson[i].id + "' selected>";
+                        } else {
+                            htmlCode += "<option value='" + brandsJson[i].id + "'>";
+                        }
+                        htmlCode += brandsJson[i].name;
+                        htmlCode += "</option>";
+                    }
+                    htmlCode += "</select>";
+                    htmlCode += "</div>";
+                    htmlCode += "</div>";
+                }
+                brands.innerHTML = htmlCode;
+            }
+            xmlHttp.open("GET", "/brand", true);
+            xmlHttp.send();
+        }
+
+        function loadCategoriesOfParameterAndParameters() {
+            let htmlCode = "";
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.status == 200 && xmlHttp.readyState == 4) {
+                    let parametersListJson = JSON.parse(this.responseText);
+                    for (let i = 0; i < parametersListJson.length; i++) {
+                        htmlCode += "<label for='parameter" + i + "'>";
+                        htmlCode += "<div class=\"form-check\">"
+                        for (let k = 0; k < itemJson.parameters.length; k++) {
+                            if (parametersListJson[i][0].categoryOfParameter.id === itemJson.parameters[k].categoryOfParameter.id) {
+                                htmlCode += "<input class=\"form-check-input\" type=\"checkbox\" value='" + parametersListJson[i][0].categoryOfParameter.name + "' id='categoryOfParameter" + i + "' checked>";
+                                htmlCode += "<label class=\"form-check-label\">"
+                                htmlCode += parametersListJson[i][0].categoryOfParameter.name;
+                                htmlCode += "</label>";
+                                htmlCode += "</div>";
+                                htmlCode += "</label>";
+                                htmlCode += "<div class=\"mb-3\">";
+                                htmlCode += "<select class=\"form-select\" id=\"parameter" + i + "\">";
+                                for (let j = 0; j < parametersListJson[i].length; j++) {
+                                    if (parametersListJson[i][j].id === itemJson.parameters[k].id) {
+                                        htmlCode += "<option value = '" + parametersListJson[i][j].id + "' selected>";
+                                    } else {
+                                        htmlCode += "<option value = '" + parametersListJson[i][j].id + "'>";
+                                    }
+                                    htmlCode += parametersListJson[i][j].name;
+                                    htmlCode += "</option>";
+                                }
+                                htmlCode += "</select>";
+                                htmlCode += "</div>";
+                                break;
+                            } else if (k === (itemJson.parameters.length - 1)) {
+                                htmlCode += "<input class=\"form-check-input\" type=\"checkbox\" value='" + parametersListJson[i][0].categoryOfParameter.name + "' id='categoryOfParameter" + i + "'>";
+                                htmlCode += "<label class=\"form-check-label\">"
+                                htmlCode += parametersListJson[i][0].categoryOfParameter.name;
+                                htmlCode += "</label>";
+                                htmlCode += "</div>";
+                                htmlCode += "</label>";
+                                htmlCode += "<div class=\"mb-3\">";
+                                htmlCode += "<select class=\"form-select\" id=\"parameter" + i + "\">";
+                                for (let j = 0; j < parametersListJson[i].length; j++) {
+                                    htmlCode += "<option value = '" + parametersListJson[i][j].id + "'>";
+                                    htmlCode += parametersListJson[i][j].name;
+                                    htmlCode += "</option>";
+                                }
+                                htmlCode += "</select>";
+                                htmlCode += "</div>";
+                            }
+                        }
+                    }
+                }
+                parameters.innerHTML = htmlCode;
+            }
+            xmlHttp.open("GET", "/parameter", true);
+            xmlHttp.send();
+        }
+
+        function updateItem() {
+            let secondCategoryObj = {
+                id: secondCategory.value
+            }
+            let brandObj = {
+                id: brand.value
+            }
+            let parametersArray = [];
+            let allCheckBoxes = document.querySelectorAll('input[type="checkbox"]');
+            for (let i = 0; i < allCheckBoxes.length; i++) {
+                if (allCheckBoxes[i].checked) {
+                    let parameterObj = {
+                        id: document.getElementById('parameter' + i).value
+                    }
+                    if (parameterObj.id !== 'null') {
+                        parametersArray.push(parameterObj);
+                    }
+                }
+            }
+            let json = {
+                "id": itemJson.id,
+                "name": namename.value,
+                "description": description.value,
+                "price": price.value,
+                "secondCategory": secondCategoryObj,
+                "brand": brandObj,
+                "parameters": parametersArray
+            };
+            let body = JSON.stringify(json);
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/item", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = () => {
+                if (xhr.status === 200 && xhr.readyState === XMLHttpRequest.DONE) {
+                    let itemObj = JSON.parse(xhr.responseText);
+                    if (itemObj != null) {
+                        alert("Товар обновлен успешно");
+                    }
+                }
+            }
+            xhr.send(body);
+        }
+    </script>
+    <div class="container">
+        <button type="button" class="btn btn-primary" onclick="updateItem()">Обновить</button>
+    </div>
+</div>
+</html>

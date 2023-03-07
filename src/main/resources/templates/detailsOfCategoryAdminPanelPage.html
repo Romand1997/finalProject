@@ -1,0 +1,62 @@
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/AdminPanelPattern.html"
+      xmlns:sec="http//www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<div layout:fragment="contentAdminPanel">
+    <div class="container">
+        <div id="category">
+        </div>
+        <div>
+            <button type="button" class="btn btn-primary" onclick="updateCategory()">Обновить</button>
+        </div>
+    </div>
+    <script type="text/javascript">
+        loadItem();
+        let categoryJson;
+
+        function loadItem() {
+            var strGET = window.location.search.replace('?', '');
+            let htmlCode = "";
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.status == 200 && xmlHttp.readyState == 4) {
+                    categoryJson = JSON.parse(this.responseText);
+                    if (categoryJson) {
+                        htmlCode += "<label for='namename' className='mt-3 mb-1'>";
+                        htmlCode += "Название:";
+                        htmlCode += "</label>";
+                        htmlCode += "<div class='mb-3'>";
+                        htmlCode += "<input type='text' value='" + categoryJson.name + "' class='form-control' aria-describedby='inputGroup-sizing-default' id='namename' required>";
+                        htmlCode += "</div>";
+                    } else {
+                        htmlCode += "<h1>404 Exception</h1>>";
+                    }
+                }
+                category.innerHTML = htmlCode;
+            }
+            xmlHttp.open("GET", "/category/category/" + strGET, true);
+            xmlHttp.send();
+        }
+
+        function updateCategory() {
+            let json = {
+                "id": categoryJson.id,
+                "name": namename.value,
+            };
+            let body = JSON.stringify(json);
+            const xhr = new XMLHttpRequest();
+            xhr.open("PUT", "/category", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = () => {
+                if (xhr.status === 200 && xhr.readyState === XMLHttpRequest.DONE) {
+                    let categoryObj = JSON.parse(xhr.responseText);
+                    if (categoryObj != null) {
+                        alert("Категория обновлена успешно");
+                    }
+                }
+            }
+            xhr.send(body);
+        }
+    </script>
+</div>
+</html>

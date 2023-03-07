@@ -1,0 +1,58 @@
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/AdminPanelPattern.html"
+      xmlns:sec="http//www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<div layout:fragment="contentAdminPanel">
+    <div class="container">
+        <div id="brand">
+        </div>
+        <div>
+            <button type="button" class="btn btn-primary" onclick="updateBrand()">Обновить</button>
+        </div>
+    </div>
+    <script type="text/javascript">
+        loadBrand();
+        let brandJson;
+
+        function loadBrand() {
+            var strGET = window.location.search.replace('?', '');
+            let htmlCode = "";
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.status == 200 && xmlHttp.readyState == 4) {
+                    brandJson = JSON.parse(this.responseText);
+                    htmlCode += "<label for='namename' class='mt-3 mb-1'>";
+                    htmlCode += "Название:";
+                    htmlCode += "</label>";
+                    htmlCode += "<div class='mb-3'>";
+                    htmlCode += "<input type='text' value='" + brandJson.name + "' class='form-control' aria-describedby='inputGroup-sizing-default' id='namename' required>";
+                    htmlCode += "</div>";
+                }
+                brand.innerHTML = htmlCode;
+            }
+            xmlHttp.open("GET", "/brand/" + strGET, true);
+            xmlHttp.send();
+        }
+
+        function updateBrand() {
+            let json = {
+                "id": brandJson.id,
+                "name": namename.value,
+            };
+            let body = JSON.stringify(json);
+            const xhr = new XMLHttpRequest();
+            xhr.open("PUT", "/brand", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = () => {
+                if (xhr.status === 200 && xhr.readyState === XMLHttpRequest.DONE) {
+                    let brandObj = JSON.parse(xhr.responseText);
+                    if (brandObj != null) {
+                        alert("Бренд обновлен успешно");
+                    }
+                }
+            }
+            xhr.send(body);
+        }
+    </script>
+</div>
+</html>

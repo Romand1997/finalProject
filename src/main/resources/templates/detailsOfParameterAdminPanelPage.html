@@ -1,0 +1,96 @@
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/AdminPanelPattern.html"
+      xmlns:sec="http//www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<div layout:fragment="contentAdminPanel">
+    <div class="container">
+        <div id="parameter">
+        </div>
+        <div id='categoriesOfParameter'>
+        </div>
+        <div>
+            <button type="button" class="btn btn-primary" onclick="updateParameter()">Обновить</button>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        let parameterJson;
+        loadParameter();
+        loadCategoriesOfParameter();
+
+        function loadParameter() {
+            var strGET = window.location.search.replace('?', '');
+            let htmlCode = "";
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.status == 200 && xmlHttp.readyState == 4) {
+                    parameterJson = JSON.parse(this.responseText);
+                    htmlCode += "<label for='namename' class='mt-3 mb-1'>";
+                    htmlCode += "Название:";
+                    htmlCode += "</label>";
+                    htmlCode += "<div class='mb-3'>";
+                    htmlCode += "<input type='text' value='" + parameterJson.name + "' class='form-control' aria-describedby='inputGroup-sizing-default' id='namename' required>";
+                    htmlCode += "</div>";
+                }
+                parameter.innerHTML = htmlCode;
+            }
+            xmlHttp.open("GET", "/parameter/parameter_id/" + strGET, true);
+            xmlHttp.send();
+        }
+
+        function loadCategoriesOfParameter() {
+            let htmlCode = "";
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.status == 200 && xmlHttp.readyState == 4) {
+                    let categoriesOfParameterJson = JSON.parse(this.responseText);
+                    htmlCode += "<label for=\"categoryOfParameter\" class=\"mb-1\">";
+                    htmlCode += "Название категории параметра:";
+                    htmlCode += "</label>";
+                    htmlCode += "<div class=\"mb-3\">";
+                    htmlCode += "<select class=\"form-select\" id=\"categoryOfParameter\">";
+                    for (let i = 0; i < categoriesOfParameterJson.length; i++) {
+                        if (categoriesOfParameterJson[i].id === parameterJson.categoryOfParameter.id) {
+                            htmlCode += "<option value='" + categoriesOfParameterJson[i].id + "' selected>";
+                        } else {
+                            htmlCode += "<option value='" + categoriesOfParameterJson[i].id + "'>";
+                        }
+                        htmlCode += categoriesOfParameterJson[i].name;
+                        htmlCode += "</option>";
+                    }
+                    htmlCode += "</select>";
+                    htmlCode += "</div>";
+
+                }
+                categoriesOfParameter.innerHTML = htmlCode;
+            }
+            xmlHttp.open("GET", "/categoryOfParameter", true);
+            xmlHttp.send();
+        }
+
+        function updateParameter() {
+            let categoryOfParameterObj = {
+                id: categoryOfParameter.value
+            }
+            let json = {
+                "id": parameterJson.id,
+                "name": namename.value,
+                "categoryOfParameter": categoryOfParameterObj
+            };
+            let body = JSON.stringify(json);
+            const xhr = new XMLHttpRequest();
+            xhr.open("PUT", "/parameter", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = () => {
+                if (xhr.status === 200 && xhr.readyState === XMLHttpRequest.DONE) {
+                    let parameterObj = JSON.parse(xhr.responseText);
+                    if (parameterObj != null) {
+                        alert("Параметр обновлен успешно");
+                    }
+                }
+            }
+            xhr.send(body);
+        }
+    </script>
+</div>
+</html>

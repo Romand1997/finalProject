@@ -1,0 +1,192 @@
+<html lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/pattern.html"
+>
+<div layout:fragment="content">
+    <div class="row">
+        <div class="rounded mt-5 ms-3 col-3 bg-light" style="height: 500px;">
+            <div class="position-sticky pt-3 sidebar-sticky">
+                <div id="sideBar">
+                </div>
+            </div>
+        </div>
+        <script>
+            var isItemMenuShow = false;
+            var isCategoryMenuShow = false;
+            var isSecondCategoryMenuShow = false;
+            var isCategoryOfParameterMenuShow = false;
+            var isParameterMenuShow = false;
+            var isBrandMenuShow = false;
+            loadSideBar()
+            function loadSideBar() {
+                let htmlCode = "";
+                htmlCode += "<a class=\"text-decoration-none sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase\" href='#' onclick='showItemMenu()'>";
+                htmlCode += "<span>Добавление/изменение товара</span>";
+                htmlCode += "</a>";
+                htmlCode += "<div id='itemMenu'>";
+                htmlCode += "</div>";
+                htmlCode += "<a class=\"text-decoration-none sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase\" href='#' onclick='showCategoryMenu()'>";
+                htmlCode += "<span>Добавление/изменение категории</span>";
+                htmlCode += "</a>";
+                htmlCode += "<div id='categoryMenu'>";
+                htmlCode += "</div>";
+                htmlCode += "<a class=\"text-decoration-none sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase\" href='#' onclick='showSecondCategoryMenu()'>";
+                htmlCode += "<span>Добавление/изменение подкатегории</span>";
+                htmlCode += "</a>";
+                htmlCode += "<div id='secondCategoryMenu'>";
+                htmlCode += "</div>";
+                htmlCode += "<a class=\"text-decoration-none sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase\" href='#' onclick='showCategoryOfParameterMenu()'>";
+                htmlCode += "<span>Добавление/изменение категории параметра</span>";
+                htmlCode += "</a>";
+                htmlCode += "<div id='categoryOfParameterMenu'>";
+                htmlCode += "</div>";
+                htmlCode += "<a class=\"text-decoration-none sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase\" href='#' onclick='showParameterMenu()'>";
+                htmlCode += "<span>Добавление/изменение параметра</span>";
+                htmlCode += "</a>";
+                htmlCode += "<div id='parameterMenu'>";
+                htmlCode += "</div>";
+                htmlCode += "<a class=\"text-decoration-none sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase\" href='#' onclick='showBrandMenu()'>";
+                htmlCode += "<span>Добавление/изменение бренда</span>";
+                htmlCode += "</a>";
+                htmlCode += "<div id='brandMenu'>";
+                htmlCode += "</div>";
+                sideBar.innerHTML = htmlCode;
+            }
+
+            function showItemMenu() {
+                let htmlCode = "";
+                if (!isItemMenuShow) {
+                    htmlCode += "<ul class=\"nav flex-column\">";
+                    htmlCode += "<li class=\"nav-item\">";
+                    htmlCode += "<a class=\"nav-link active\" aria-current=\"page\" href='/addItemAdminPanel'>";
+                    htmlCode += "<span>Добавление товара</span>";
+                    htmlCode += "</a>";
+                    htmlCode += "</li>";
+                    htmlCode += "<li class=\"nav-item\">";
+                    htmlCode += "<a class=\"nav-link active\" aria-current=\"page\" href='/updateItemAdminPanel'>";
+                    htmlCode += "<span>Изменение товара</span>";
+                    htmlCode += "</a>";
+                    htmlCode += "</li>";
+                    htmlCode += "</ul>";
+                    isItemMenuShow = true;
+                } else {
+                    isItemMenuShow = false;
+                }
+                itemMenu.innerHTML = htmlCode;
+            }
+
+            function showCategoryMenu() {
+                let htmlCode = "";
+                if (!isCategoryMenuShow) {
+                    htmlCode += "<ul class=\"nav flex-column\">";
+                    htmlCode += "<li class=\"nav-item\">";
+                    htmlCode += "<a class=\"nav-link active\" aria-current=\"page\" href='/addCategoryAdminPanel'>";
+                    htmlCode += "<span>Добавление категории</span>";
+                    htmlCode += "</a>";
+                    htmlCode += "</li>";
+                    htmlCode += "<li class=\"nav-item\">";
+                    htmlCode += "<a class=\"nav-link active\" aria-current=\"page\" href='/updateCategoryAdminPanel'>";
+                    htmlCode += "<span>Изменение категории</span>";
+                    htmlCode += "</a>";
+                    htmlCode += "</li>";
+                    htmlCode += "</ul>";
+                    isCategoryMenuShow = true;
+                } else {
+                    isCategoryMenuShow = false;
+                }
+                categoryMenu.innerHTML = htmlCode;
+            }
+
+            function showSecondCategoryMenu() {
+                let htmlCode = "";
+                if (!isSecondCategoryMenuShow) {
+                    htmlCode += "<ul class=\"nav flex-column\">";
+                    htmlCode += "<li class=\"nav-item\">";
+                    htmlCode += "<a class=\"nav-link active\" aria-current=\"page\" href='/addSecondCategoryAdminPanel'>";
+                    htmlCode += "<span>Добавление подкатегории</span>";
+                    htmlCode += "</a>";
+                    htmlCode += "</li>";
+                    htmlCode += "<li class=\"nav-item\">";
+                    htmlCode += "<a class=\"nav-link active\" aria-current=\"page\" href='/updateSecondCategoryAdminPanel'>";
+                    htmlCode += "<span>Изменение подкатегории</span>";
+                    htmlCode += "</a>";
+                    htmlCode += "</li>";
+                    htmlCode += "</ul>";
+                    isSecondCategoryMenuShow = true;
+                } else {
+                    isSecondCategoryMenuShow = false;
+                }
+                secondCategoryMenu.innerHTML = htmlCode;
+            }
+
+            function showCategoryOfParameterMenu() {
+                let htmlCode = "";
+                if (!isCategoryOfParameterMenuShow) {
+                    htmlCode += "<ul class=\"nav flex-column\">";
+                    htmlCode += "<li class=\"nav-item\">";
+                    htmlCode += "<a class=\"nav-link active\" aria-current=\"page\" href='/addCategoryOfParameterAdminPanel'>";
+                    htmlCode += "<span>Добавление категории параметра</span>";
+                    htmlCode += "</a>";
+                    htmlCode += "</li>";
+                    htmlCode += "<li class=\"nav-item\">";
+                    htmlCode += "<a class=\"nav-link active\" aria-current=\"page\" href='/updateCategoryOfParameterAdminPanel'>";
+                    htmlCode += "<span>Изменение категории параметра</span>";
+                    htmlCode += "</a>";
+                    htmlCode += "</li>";
+                    htmlCode += "</ul>";
+                    isCategoryOfParameterMenuShow = true;
+                } else {
+                    isCategoryOfParameterMenuShow = false;
+                }
+                categoryOfParameterMenu.innerHTML = htmlCode;
+            }
+
+            function showParameterMenu() {
+                let htmlCode = "";
+                if (!isParameterMenuShow) {
+                    htmlCode += "<ul class=\"nav flex-column\">";
+                    htmlCode += "<li class=\"nav-item\">";
+                    htmlCode += "<a class=\"nav-link active\" aria-current=\"page\" href='/addParameterAdminPanel'>";
+                    htmlCode += "<span>Добавление параметра</span>";
+                    htmlCode += "</a>";
+                    htmlCode += "</li>";
+                    htmlCode += "<li class=\"nav-item\">";
+                    htmlCode += "<a class=\"nav-link active\" aria-current=\"page\" href='/updateParameterAdminPanel'>";
+                    htmlCode += "<span>Изменение параметра</span>";
+                    htmlCode += "</a>";
+                    htmlCode += "</li>";
+                    htmlCode += "</ul>";
+                    isParameterMenuShow = true;
+                } else {
+                    isParameterMenuShow = false;
+                }
+                parameterMenu.innerHTML = htmlCode;
+            }
+
+            function showBrandMenu() {
+                let htmlCode = "";
+                if (!isBrandMenuShow) {
+                    htmlCode += "<ul class=\"nav flex-column\">";
+                    htmlCode += "<li class=\"nav-item\">";
+                    htmlCode += "<a class=\"nav-link active\" aria-current=\"page\" href='/addBrandAdminPanel'>";
+                    htmlCode += "<span>Добавление бренда</span>";
+                    htmlCode += "</a>";
+                    htmlCode += "</li>";
+                    htmlCode += "<li class=\"nav-item\">";
+                    htmlCode += "<a class=\"nav-link active\" aria-current=\"page\" href='/updateBrandAdminPanel'>";
+                    htmlCode += "<span>Изменение бренда</span>";
+                    htmlCode += "</a>";
+                    htmlCode += "</li>";
+                    htmlCode += "</ul>";
+                    isBrandMenuShow = true;
+                } else {
+                    isBrandMenuShow = false;
+                }
+                brandMenu.innerHTML = htmlCode;
+            }
+        </script>
+        <div class="mt-5 col-8" layout:fragment="contentAdminPanel">
+        </div>
+    </div>
+</div>
+</html>
+

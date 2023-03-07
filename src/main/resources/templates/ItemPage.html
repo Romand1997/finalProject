@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/pattern.html">
+<div layout:fragment="content">
+    <div id="item">
+
+    </div>
+    <!-- Модальное окно -->
+    <div class="modal fade" id="addReviewModal" tabindex="-1" aria-labelledby="addReviewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="addReviewModalLabel">Добавление отзыва</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="content" class="mb-1">
+                        Содержание:
+                    </label>
+                    <div class="mb-3">
+                <textarea class="form-control" aria-label="Вводит содержание товара"
+                          name="content"
+                          id="content"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-success" onclick="addReview()">Добавить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        var myDeleteModal = new bootstrap.Modal(document.getElementById('addReviewModal'), {});
+        let itemJson;
+        loadItem();
+
+        function loadItem() {
+            var strGET = window.location.search.replace('?', '');
+            let htmlCode = "";
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.status == 200 && xmlHttp.readyState == 4) {
+                    itemJson = JSON.parse(this.responseText);
+
+                    htmlCode += "<div class=\"pt-5\">";
+                    htmlCode += "<div class=\"card border border-0\">";
+                    htmlCode += "<div class=\"card-header\">";
+                    htmlCode += "<h3 class=\"card-title\">" + itemJson.secondCategory.name + " " + itemJson.brand.name + " " + itemJson.name + "</h3>";
+                    htmlCode += "</div>";
+                    htmlCode += "<div class=\"row\">";
+                    htmlCode += "<div class=\"col-5 m-2\">";
+                    htmlCode += "<img src=\"/pictures/default-store-489-500.jpg\">";
+                    htmlCode += "</div>";
+                    htmlCode += "<div class=\"col-6\">";
+                    htmlCode += "<div class=\"ms-5 mt-5 col-8 mb-2 d-flex justify-content-around\">";
+                    htmlCode += "<h1 class=\"me-2\">" + itemJson.price+"</h1>";
+                    htmlCode += "<h1>";
+                    htmlCode += "<button class=\"btn btn-warning\" type=\"button\" onclick='addToCart()'>В корзину</button>";
+                    htmlCode += "</h3>";
+                    htmlCode += "</div>";
+                    htmlCode += "<div class=\"container mt-4 mb-2\">";
+                    htmlCode += "<p>"+itemJson.description+"</p>";
+                    htmlCode += "</div>";
+                    htmlCode += "</div>";
+                    htmlCode += "</div>";
+                    htmlCode += "</div>";
+                    htmlCode += "<div class=\"row mt-3\">";
+                    htmlCode += "<div class=\"col-2\"></div>";
+                    htmlCode += "<div class=\"col-8\">";
+                    htmlCode += "<h3 class=\"mb-2\">Характеристики " + itemJson.secondCategory.name + " " + itemJson.brand.name + " " + itemJson.name + "</h3>";
+                    htmlCode += "<div>";
+                    htmlCode += "<table class=\"table\">";
+                    htmlCode += "<tbody>";
+                    for (let i = 0; i < itemJson.parameters.length; i++) {
+                        htmlCode += "<tr>";
+                        htmlCode += "<td>" + itemJson.parameters[i].categoryOfParameter.name + "</td>";
+                        htmlCode += "<td>" + itemJson.parameters[i].name + "</td>";
+                        htmlCode += "</tr>";
+                    }
+                    htmlCode += "</tbody>";
+                    htmlCode += "</table>";
+                    htmlCode += "</div>";
+                    htmlCode += "<div class='mt-3 d-flex justify-content-around'>";
+                    htmlCode += "<div>";
+                    htmlCode += "<h3>Отзывы о товаре</h3>";
+                    htmlCode += "</div>";
+                    htmlCode += "<div>";
+                    htmlCode += "<a onclick='openModal()' class='btn btn-primary'>Оставить свой отзыв</a>";
+                    htmlCode += "</div>";
+                    htmlCode += "</div>";
+                    htmlCode += "<div class='mt-1' id='reviews'>";
+                    htmlCode += "</div>";
+                    htmlCode += "</div>";
+                    htmlCode += "</div>";
+                    htmlCode += "<div class=\"col-2\"></div>"
+                    htmlCode += "</div>";
+                    htmlCode += "</div>";
+                    htmlCode += "</div>";
+                }
+                item.innerHTML = htmlCode;
+                loadReviews();
+            }
+            xmlHttp.open("GET", "/item/" + strGET, true);
+            xmlHttp.send();
+        }
+
+        function loadReviews() {
+            let htmlCode = "";
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.status == 200 && xmlHttp.readyState == 4) {
+                    reviewsJson = JSON.parse(this.responseText);
+                    for (let i = 0; i < reviewsJson.length; i++) {
+                        htmlCode += "<div class=\"card\">";
+                        htmlCode += "<div class='card-header'>";
+                        htmlCode += reviewsJson[i].user.full_name + " в " + reviewsJson[i].localDateTime;
+                        htmlCode += "</div>";
+                        htmlCode += "<div class=\"card-body\">";
+                        htmlCode += "<p class=\"card-text\">" + reviewsJson[i].content + "</p>";
+                        htmlCode += "</div>";
+                        htmlCode += "</div>";
+                    }
+                }
+                reviews.innerHTML = htmlCode;
+            }
+            xmlHttp.open("GET", "/review/" + itemJson.id, true);
+            xmlHttp.send();
+        }
+
+        function openModal() {
+            myDeleteModal.show();
+        }
+
+        function addToCart() {
+            let json = {
+                "id": itemJson.id,
+            };
+            let body = JSON.stringify(json);
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/order/addItem", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = () => {
+                if (xhr.status === 200 && xhr.readyState === XMLHttpRequest.DONE) {
+                    let orderObj = JSON.parse(xhr.responseText);
+                    if (orderObj != null) {
+                        alert("Товар добавлен в корзину");
+                        location.reload();
+                    }
+                }
+            }
+            xhr.send(body);
+        }
+
+        function addReview() {
+            myDeleteModal.hide();
+            let itemObj = {
+                id: itemJson.id
+            }
+            let json = {
+                "content": content.value,
+                "item": itemObj
+            };
+            let body = JSON.stringify(json);
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/review", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = () => {
+                if (xhr.status === 200 && xhr.readyState === XMLHttpRequest.DONE) {
+                    let reviewObj = JSON.parse(xhr.responseText);
+                    if (reviewObj != null) {
+                        alert("Отзыв успешно добавлен");
+                        loadReviews();
+                    }
+                }
+            }
+            xhr.send(body);
+        }
+
+    </script>
+
+</div>
+</html>

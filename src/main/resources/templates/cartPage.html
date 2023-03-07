@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/pattern.html">
+<div layout:fragment="content">
+    <div class="pt-5 row text-center">
+        <div class="col"></div>
+        <div class="col-8">
+            <div class="row text-center" id="cart">
+            </div>
+        </div>
+        <div class="col"></div>
+    </div>
+    <script type="text/javascript">
+        let orderJson;
+        loadCart();
+
+        function loadCart() {
+            let htmlCode = "";
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.status == 200 && xmlHttp.readyState == 4) {
+                    orderJson = JSON.parse(this.responseText);
+                    htmlCode += "<table class=\"table\">";
+                    htmlCode += "<tbody>";
+                    for (let i = 0; i < orderJson.items.length; i++) {
+                        htmlCode += "<tr>";
+                        htmlCode += "<td>" + orderJson.items[i].secondCategory.name + " " + orderJson.items[i].brand.name + " " + orderJson.items[i].name + "</td>";
+                        htmlCode += "<td><button class='btn btn-danger' onclick='deleteItemFromCart("+orderJson.items[i].id+")'>Удалить</button></td>";
+                        htmlCode += "</tr>";
+                    }
+                    htmlCode += "</tbody>";
+                    htmlCode += "</table>";
+                    htmlCode += "<button class = 'btn btn-warning' size='100px' onclick='sendOrder()'>Оформить Заказ</button>";
+                }
+                cart.innerHTML = htmlCode;
+            }
+            xmlHttp.open("GET", "/order/orderByUser", true);
+            xmlHttp.send();
+        }
+
+        function deleteItemFromCart(id) {
+            let json = {
+                "id": id,
+            };
+            let body = JSON.stringify(json);
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/order/deleteItem", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = () => {
+                if (xhr.status === 200 && xhr.readyState === XMLHttpRequest.DONE) {
+                    let itemObj = JSON.parse(xhr.responseText);
+                    if (itemObj != null) {
+                        location.reload();
+                    }
+                }
+            }
+            xhr.send(body);
+        }
+
+        function sendOrder() {
+            let json = orderJson;
+            let body = JSON.stringify(json);
+            const xhr = new XMLHttpRequest();
+            xhr.open("PUT", "/order/clearOrder", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = () => {
+                if (xhr.status === 200 && xhr.readyState === XMLHttpRequest.DONE) {
+                    let itemObj = JSON.parse(xhr.responseText);
+                    if (itemObj != null) {
+                        alert("Ваш заказ отправлен. Ожидайте связи со специалистом.")
+                        location.reload();
+                    }
+                }
+            }
+            xhr.send(body);
+        }
+    </script>
+
+</div>
+</html>
